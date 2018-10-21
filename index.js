@@ -1,5 +1,8 @@
 var express = require('express');
 var path = require('path'), fs=require('fs');
+var cors = require('cors');
+const config = require("./config");
+
 
 function fromDir(startPath,filter,callback){
 
@@ -21,52 +24,56 @@ function fromDir(startPath,filter,callback){
     };
 };
 
-fromDir("\\\\192.168.0.104\\external2\\moviesss" ,/\.mp4$/,function(filename){
-    console.log('-- found: ',filename);
+// exempel path
+// \\192.168.0.104\external2\moviesss\Movies\Catch.Me.If.You.Can.2002.1080p.BluRay.x264.AC3-ETRG\Catch.Me.If.You.Can.2002.1080p.BluRay.x264.AC3-ETRG.mp4
+var paths = [];
+fromDir(config.moiveDir ,/\.mp4$/,function(filename){
+    //console.log('-- found: ',filename);
+    paths.push(filename);
 });
-var app = express();
+fromDir(config.moiveDir ,/\.mkv$/,function(filename){
+    //console.log('-- found: ',filename);
+    paths.push(filename);
+});
 
-// const path = '/home/filip/Desktop/Ready Player One (2018) [WEBRip] [1080p] [YTS.AM]'
-// const stat = fs.statSync(path)
-// const fileSize = stat.size
-// const range = req.headers.range
-//
-// if (range) {
-//   const parts = range.replace(/bytes=/, "").split("-")
-//   const start = parseInt(parts[0], 10)
-//   const end = parts[1]
-//     ? parseInt(parts[1], 10)
-//     : fileSize-1
-//   const chunksize = (end-start)+1
-//   const file = fs.createReadStream(path, {start, end})
-//   const head = {
-//     'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-//     'Accept-Ranges': 'bytes',
-//     'Content-Length': chunksize,
-//     'Content-Type': 'video/mp4',
-//   }
-//
-//   res.writeHead(206, head);
-//   file.pipe(res);
-// } else {
-//   const head = {
-//     'Content-Length': fileSize,
-//     'Content-Type': 'video/mp4',
-//   }
-//   res.writeHead(200, head)
-//   fs.createReadStream(path).pipe(res)
+var movies = {};
+
+for (var i = 0; i < paths.length; i++) {
+    var n = paths[i].split("\\").slice(-1)[0];
+    n = n.replace(/\./g, " ");
+    movies[n] = {
+            autoplay: false,
+            controls: true,
+            sources: [{
+                src: paths[i],
+                type: 'video/mp4'
+            }]
+        }
+}
+
+
+
+// for(item in movies){
+//     console.log("\n");
+//     console.log(item + ": \n");
+//     console.log(movies[item]);
 // }
-// });
+console.table(movies);
+console.log(paths.length);
+
+var app = express();
+app.use(cors())
+
 
     app.get("/index.html", function (req, res, next){
         res.redirect("/");
     });
 
     app.get('/', function (req, res, next) {
-        res.status(200).sendFile(__dirname + "/lib/index.html")
+        res.status(200).send(movies);
     });
 
-    var server = app.listen(3000, "127.0.0.1",  function () {
+    var server = app.listen(config.port, "127.0.0.1",  function () {
       var location = server.address();
       var host = location.address;
       var port = location.port;
