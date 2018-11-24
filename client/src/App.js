@@ -1,16 +1,19 @@
 import React, { Component } from 'react';
 import { Button, Navbar, NavbarBrand, NavItem, NavLink, Nav, Card, CardBody, CardImg, CardText, CardLink,
   CardTitle} from 'reactstrap';
-import VideoPlayer  from './Player'
+import "video-react/dist/video-react.css"; // import css
+import { Player } from 'video-react';
 const axios = require('axios');
 
 class App extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-				movies: {}
+				movies: {},
+                tmpMovieLink: ""
 		}
 		this.getMovies = this.getMovies.bind(this);
+        this.getMovie = this.getMovie.bind(this);
 	};
 
 	getMovies(){
@@ -20,7 +23,15 @@ class App extends Component {
                 console.table(this.state.movies);
 			}
 		);
-}
+    }
+
+    getMovie(name){
+        axios.get("http://127.0.0.1:8080/getVideo",{params: {videoName: name}})
+		.then(res => {
+			return res.data
+		});
+    }
+
 	componentWillMount() {
 		this.getMovies();
 	}
@@ -44,10 +55,11 @@ class App extends Component {
       </Navbar>
       <div id="movieFeed">
             {Object.keys(this.state.movies).map((name) =>
-                <Card nameclass="movie" id={name}>
+
+                <Card nameclass="movie" id={name} key={name}>
                     <CardBody>
                         <CardTitle>{name}</CardTitle>
-                        <VideoPlayer { ...this.state.movies[name] } />
+                            <CardImg src={ } alt="Sorry No Poster Found">
                     </CardBody>
                 </Card>
             )}

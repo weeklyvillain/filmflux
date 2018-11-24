@@ -41,23 +41,16 @@ var movies = {};
 for (var i = 0; i < paths.length; i++) {
     var n = paths[i].split("\\").slice(-1)[0];
     n = n.replace(/\./g, " ");
-    movies[n] = {
-            autoplay: false,
-            controls: true,
-            sources: [{
-                src: paths[i],
-                type: 'video/mp4'
-            }]
-        }
+    movies[n] = paths[i]
 }
 
 
 
-// for(item in movies){
-//     console.log("\n");
-//     console.log(item + ": \n");
-//     console.log(movies[item]);
-// }
+for(item in movies){
+    console.log("\n");
+    console.log(item + ": \n");
+    console.log(movies[item]);
+}
 console.table(movies);
 console.log(paths.length);
 
@@ -72,6 +65,47 @@ app.use(cors())
     app.get('/', function (req, res, next) {
         res.status(200).send(movies);
     });
+
+
+
+    app.get('/getVideo', function(req, res) {
+        console.log(req.query.videoName)
+        console.log(movies[req.query.videoName])
+      const path = movies[req.query.videoName]
+      const stat = fs.statSync(path)
+      const fileSize = stat.size
+      const range = req.headers.range
+      if (range) {
+        const parts = range.replace(/bytes=/, "").split("-")
+        const start = parseInt(parts[0], 10)
+        const end = parts[1] ? parseInt(parts[1], 10) : fileSize-1
+        const chunksize = (end-start)+1
+        const file = fs.createReadStream(path, {start, end})
+        const head = {
+          'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+          'Accept-Ranges': 'bytes',
+          'Content-Length': chunksize,
+          'Content-Type': 'video/mp4',
+        }
+        res.writeHead(206, head);
+        file.pipe(res);
+      } else {
+        const head = {
+          'Content-Length': fileSize,
+          'Content-Type': 'video/mp4',
+        }
+        res.writeHead(200, head)
+        fs.createReadStream(path).pipe(res)
+      }
+    });
+
+    app.get('/getVideo1', function(req, res) {
+        console.log(req.query.videoName)
+        console.log(movies[req.query.videoName])
+      const path = movies[req.query.videoName]
+      res.send(path)
+      });
+
 
     var server = app.listen(config.port, "127.0.0.1",  function () {
       var location = server.address();
