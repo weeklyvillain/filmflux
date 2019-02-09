@@ -59,7 +59,8 @@ class App extends Component {
                 <Card nameclass="movie" id={name} key={name}>
                     <CardBody>
                         <CardTitle>{name}</CardTitle>
-                            <CardImg src={ } alt="Sorry No Poster Found">
+                            <CardImg alt="Sorry No Poster Found"></CardImg>
+                            <Player src={"http://127.0.0.1:8080/getVideo?videoName=" + name} />
                     </CardBody>
                 </Card>
             )}
