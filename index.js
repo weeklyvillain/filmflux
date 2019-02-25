@@ -2,6 +2,7 @@ var express = require('express');
 var path = require('path'), fs=require('fs');
 var cors = require('cors');
 const config = require("./config");
+const movieDB = require('moviedb')('67f5a7ea9444704a937caf4bb96830fe');
 
 
 function fromDir(startPath,filter,callback){
@@ -27,11 +28,11 @@ function fromDir(startPath,filter,callback){
 // exempel path
 // \\192.168.0.104\external2\moviesss\Movies\Catch.Me.If.You.Can.2002.1080p.BluRay.x264.AC3-ETRG\Catch.Me.If.You.Can.2002.1080p.BluRay.x264.AC3-ETRG.mp4
 var paths = [];
-fromDir(config.moiveDir ,/\.mp4$/,function(filename){
+fromDir(config.movieDir ,/\.mp4$/,function(filename){
     //console.log('-- found: ',filename);
     paths.push(filename);
 });
-fromDir(config.moiveDir ,/\.mkv$/,function(filename){
+fromDir(config.movieDir ,/\.mkv$/,function(filename){
     //console.log('-- found: ',filename);
     paths.push(filename);
 });
@@ -39,20 +40,26 @@ fromDir(config.moiveDir ,/\.mkv$/,function(filename){
 var movies = {};
 
 for (var i = 0; i < paths.length; i++) {
+    // fixar till namn
     var n = paths[i].split("\\").slice(-1)[0];
     n = n.replace(/\./g, " ");
+    n = n.split("mp4").join("").split(" ").join("");
+    console.log(JSON.stringify(n))
     movies[n] = paths[i]
 }
 
 
-
+/*
 for(item in movies){
-    console.log("\n");
-    console.log(item + ": \n");
-    console.log(movies[item]);
-}
+    //console.log("\n");
+    //console.log(item + ": \n");
+    //console.log(movies[item]);
+    movieDB.searchMovie({ query: item }, (err, res) => {
+        console.log(res);
+});
+}*/
 console.table(movies);
-console.log(paths.length);
+console.log("Hittade Filmer: " + paths.length);
 
 var app = express();
 app.use(cors())
@@ -67,12 +74,13 @@ app.use(cors())
     });
 
 
-
-    app.get('/getVideo', function(req, res) {
-        console.log(req.query.videoName)
-        console.log(movies[req.query.videoName])
+app.get('/getVideo', function(req, res) {
+      console.log(req.query.videoName)
+      console.table(movies);
+      const name = req.query.videoName;
       const path = movies[req.query.videoName]
-      const stat = fs.statSync(path)
+      console.log(path);
+      const stat = fs.statSync(paths[0])
       const fileSize = stat.size
       const range = req.headers.range
       if (range) {
@@ -95,21 +103,16 @@ app.use(cors())
           'Content-Type': 'video/mp4',
         }
         res.writeHead(200, head)
-        fs.createReadStream(path).pipe(res)
+        fs.createReadStream(paths[0]).pipe(res)
       }
     });
 
-    app.get('/getVideo1', function(req, res) {
-        console.log(req.query.videoName)
-        console.log(movies[req.query.videoName])
-      const path = movies[req.query.videoName]
-      res.send(path)
-      });
+
 
 
     var server = app.listen(config.port, "127.0.0.1",  function () {
       var location = server.address();
       var host = location.address;
       var port = location.port;
-      console.log('Example app listening at http://%s:%s', host, port);
+      console.log('Server listening at http://%s:%s', host, port);
 });
