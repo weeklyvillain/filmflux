@@ -55,27 +55,16 @@ class App extends Component {
       <div id="movieFeed">
       <Row>
             {Object.keys(this.state.movies).map((name) =>
-<<<<<<< HEAD
                     <Col xs="auto" key={name}>
                     <a  href={"/" + name}>
-                      <Card class="movie-frame" id={name}>
+                      <Card className="movie-frame" id={name}>
                         <CardHeader>{name}</CardHeader>
                           <CardBody>
-                            <CardImg top width="100%" src="antman.jpg" alt="Sorry No Poster Found" />
+                            <CardImg top width="100%" src={"https://image.tmdb.org/t/p/original/" + this.state.movies[name].poster_path} alt="Sorry No Poster Found" />
                           </CardBody>
                         </Card>
                       </a>
                     </Col>
-=======
-
-                <Card nameclass="movie" id={name} key={name}>
-                    <CardBody>
-                        <CardTitle>{name}</CardTitle>
-                            <CardImg alt="Sorry No Poster Found"></CardImg>
-                            <Player src={"http://127.0.0.1:8080/getVideo?videoName=" + name} />
-                    </CardBody>
-                </Card>
->>>>>>> 5132c2a2c29f778edffb7e82541f573ba24a680e
             )}
             </Row>
       </div>

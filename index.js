@@ -43,21 +43,21 @@ for (var i = 0; i < paths.length; i++) {
     // fixar till namn
     var n = paths[i].split("\\").slice(-1)[0];
     n = n.replace(/\./g, " ");
-    n = n.split("mp4").join("").split(" ").join("");
+    n = n.split("mp4").join("").trim();
     console.log(JSON.stringify(n))
-    movies[n] = paths[i]
+    //movies[n] = paths[i]
+    var counter = i;
+    movieDB.searchMovie({ query: n }, (err, res) => {
+        //console.log(res.results[0]);
+        if(res.results[0] !== undefined) {
+
+          movies[res.results[0].title] = res.results[0];
+          movies[res.results[0].title]["file_path"] = paths[counter];
+        } else {
+          //movieLib[item]
+        }
+})
 }
-
-
-/*
-for(item in movies){
-    //console.log("\n");
-    //console.log(item + ": \n");
-    //console.log(movies[item]);
-    movieDB.searchMovie({ query: item }, (err, res) => {
-        console.log(res);
-});
-}*/
 console.table(movies);
 console.log("Hittade Filmer: " + paths.length);
 
@@ -76,9 +76,8 @@ app.use(cors())
 
 app.get('/getVideo', function(req, res) {
       console.log(req.query.videoName)
-      console.table(movies);
       const name = req.query.videoName;
-      const path = movies[req.query.videoName]
+      const path = movies[req.query.videoName].file_path
       console.log(path);
       const stat = fs.statSync(paths[0])
       const fileSize = stat.size

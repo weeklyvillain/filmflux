@@ -39,10 +39,10 @@ render() {
             </NavItem>
           </Nav>
       </Navbar>
-      <video id='my_video_1' class='video-js vjs-default-skin' controls preload='auto' width='1080p' height='720p'
+      <video id='my_video_1' className='video-js vjs-default-skin' controls preload='auto' width='1080p' height='720p'
           poster='MY_VIDEO_POSTER.jpg' data-setup='{}'>
           <source src={this.state.Movie} type='video/mp4' />
-          <p class='vjs-no-js'>
+          <p className='vjs-no-js'>
           To view this video please enable JavaScript, and consider upgrading to a web browser that
           <a href='https://videojs.com/html5-video-support/' target='_blank'>supports HTML5 video</a>
           </p>
