@@ -9,8 +9,9 @@ class App extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
+        sortedMovies: [],
 				movies: {},
-                tmpMovieLink: ""
+        tmpMovieLink: ""
 		}
 		this.getMovies = this.getMovies.bind(this);
         this.getMovie = this.getMovie.bind(this);
@@ -19,8 +20,13 @@ class App extends Component {
 	getMovies(){
 		axios.get("http://127.0.0.1:8080/")
 		.then(res => {
-				this.setState({movies: res.data});
-                console.table(this.state.movies);
+      for(var key in res.data) {
+        this.state.sortedMovies.push(key);
+      }
+      this.state.sortedMovies.sort();
+
+			this.setState({movies: res.data});
+      console.table(this.state.movies);
 			}
 		);
     }
