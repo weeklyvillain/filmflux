@@ -2,7 +2,7 @@ var express = require('express');
 var path = require('path'), fs=require('fs');
 var cors = require('cors');
 const config = require("./config");
-const movieDB = require('moviedb')('67f5a7ea9444704a937caf4bb96830fe');
+const movieDB = require('moviedb')('c34755ecfd8f85539506f7a609a8ab73');
 
 
 function fromDir(startPath,filter,callback){
@@ -41,14 +41,14 @@ var movies = {};
 
 for (var i = 0; i < paths.length; i++) {
     // fixar till namn
-    var n = paths[i].split("\\").slice(-1)[0];
+    var n = paths[i].split("/").slice(-1)[0];
     n = n.replace(/\./g, " ");
     n = n.split("mp4").join("").trim();
     console.log(JSON.stringify(n))
     //movies[n] = paths[i]
     var counter = i;
     movieDB.searchMovie({ query: n }, (err, res) => {
-        //console.log(res.results[0]);
+        console.log(res.results[0]);
         if(res.results[0] !== undefined) {
 
           movies[res.results[0].title] = res.results[0];
@@ -78,8 +78,8 @@ app.get('/getVideo', function(req, res) {
       console.log(req.query.videoName)
       const name = req.query.videoName;
       const path = movies[req.query.videoName].file_path
-      console.log(path);
-      const stat = fs.statSync(paths[0])
+      console.log(path.file_path);
+      const stat = fs.statSync(path)
       const fileSize = stat.size
       const range = req.headers.range
       if (range) {
