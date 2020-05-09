@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { Button, Navbar, NavbarBrand, NavItem, NavLink, Nav, Card, CardBody, CardImg, CardText, CardLink,
+import { Navbar, NavbarBrand, NavItem, NavLink, Nav, Card, CardBody, CardImg,
   CardHeader, Row, Col} from 'reactstrap';
 import "video-react/dist/video-react.css"; // import css
-import { Player } from 'video-react';
 const axios = require('axios');
+
+ 
 
 class App extends Component {
 	constructor(props) {
@@ -14,7 +15,7 @@ class App extends Component {
         tmpMovieLink: ""
 		}
 		this.getMovies = this.getMovies.bind(this);
-        this.getMovie = this.getMovie.bind(this);
+    this.getMovie = this.getMovie.bind(this);
 	};
 
 	getMovies(){
@@ -40,10 +41,11 @@ class App extends Component {
 
 	componentWillMount() {
 		this.getMovies();
-	}
+  }
 
 
 	render() {
+    console.log(this.state.movies);
 		return (
         <div>
 
@@ -62,12 +64,12 @@ class App extends Component {
       <Row>
             {Object.keys(this.state.movies).map((name) =>
                     <Col xs="auto" key={name}>
-                    <a  href={"/" + name}>
+                    <a href={"filmflux://http://127.0.0.1:8080/getVideo?videoName=" + name} target="_blank" rel="noopener noreferrer">
                       <Card className="movie-frame" id={name}>
-                        <CardHeader>{name}</CardHeader>
                           <CardBody>
-                            <CardImg top width="100%" src={"https://image.tmdb.org/t/p/original/" + this.state.movies[name].poster_path} alt="Sorry No Poster Found" />
+                            <CardImg top width="100%" src={this.state.movies[name].Poster} alt="Sorry No Poster Found" />
                           </CardBody>
+                        <CardHeader>{name}</CardHeader>
                         </Card>
                       </a>
                     </Col>

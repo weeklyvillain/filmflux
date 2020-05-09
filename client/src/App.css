@@ -1,11 +1,16 @@
-.card {
-  margin-top: 5%;
+.row {
+  margin-top: 1%;
+}
+.col-auto {
   margin-left: 1%;
-  max-width: 180px;
+  max-width: 14vw;
+}
+.card {
+  height: 45vh;
 }
 
 .card:hover{
-  transform: scale(1.1, 1.1);
+  transform: scale(1.02, 1.02);
 }
 .card-img-top {
   height: 100%;
@@ -24,4 +29,9 @@ a:link, a:visited, a:hover, a:active {
   color: black;
   text-align: center;
   text-decoration: none;
+}
+
+
+#videoPlayer {
+  width: 100% !important;
 }

@@ -2,8 +2,13 @@ var express = require('express');
 var path = require('path'), fs=require('fs');
 var cors = require('cors');
 const config = require("./config");
-const movieDB = require('moviedb')('c34755ecfd8f85539506f7a609a8ab73');
-
+//const movieDB = require('moviedb')('67f5a7ea9444704a937caf4bb96830fe');
+var omdbApi = require('omdb-client');
+var params = {
+  apiKey: 'd9d4c56a',
+  query: '',
+}
+const superagent = require('superagent');
 
 function fromDir(startPath,filter,callback){
 
@@ -33,33 +38,97 @@ fromDir(config.movieDir ,/\.mp4$/,function(filename){
     paths.push(filename);
 });
 fromDir(config.movieDir ,/\.mkv$/,function(filename){
-    //console.log('-- found: ',filename);
+    console.log('-- found: ',filename);
     paths.push(filename);
 });
 
 var movies = {};
 
-for (var i = 0; i < paths.length; i++) {
-    // fixar till namn
-    var n = paths[i].split("/").slice(-1)[0];
-    n = n.replace(/\./g, " ");
-    n = n.split("mp4").join("").trim();
-    console.log(JSON.stringify(n))
-    //movies[n] = paths[i]
-    var counter = i;
-    movieDB.searchMovie({ query: n }, (err, res) => {
-        console.log(res.results[0]);
-        if(res.results[0] !== undefined) {
 
-          movies[res.results[0].title] = res.results[0];
-          movies[res.results[0].title]["file_path"] = paths[counter];
-        } else {
-          //movieLib[item]
-        }
-})
+
+let add_to_map = (res, index) => {
+  movies[res["Title"]] = res;
+  //movies[res.Title]["file_path"] = "\\\\192.168.0.4\\storage\\Movies\\Zootopia.mp4";
+  movies[res.Title]["file_path"] = paths[index];
 }
-console.table(movies);
-console.log("Hittade Filmer: " + paths.length);
+
+let get_correct_name = (name, index) => {
+  params.query = name;
+
+  superagent
+    .get('http://www.omdbapi.com/')
+    .query({ t: name, apiKey: "d9d4c56a"}) // query string
+    .end((err, res) => {
+      // Do something
+      //console.log("asdadasdadad")
+      //console.log(res.body)
+      if(res.body.Response != 'False') {
+        add_to_map(res.body, index)
+      }
+  });
+
+
+  let series_array = name.match(/s\d\d e\d\d/g);
+  if (series_array != null){
+    let sAndE = series_array[0].split(" ")
+    name = name.replace("(" + series_array[0] + ")", "")
+    name = name.trim()
+    console.log(series_array)
+    let s = sAndE[0].replace(new RegExp("[^\d]"), '');
+    let e = sAndE[1].replace(new RegExp("[^\d]"), '');
+    console.log("Name: " + name)
+    console.log("SEASON: " + parseInt(s))
+    console.log("Episode: " + parseInt(e))
+    superagent
+    .get('http://www.omdbapi.com/')
+    .query({ t: name, Season: parseInt(s), Episode: parseInt(e), apiKey: "d9d4c56a"}) // query string
+    .end((err, res) => {
+      // Do something
+      //console.log("asdadasdadad")
+      console.log(res.body)
+      if(res.body.Response != 'False') {
+        console.log("found serie " + res.body.Title)
+        add_to_map(res.body, index)
+      }
+  });
+  }
+  
+
+  /*omdbApi.search(params, function(err, data) {
+    // process response...
+    if(data == undefined) {
+      console.log("Could not find movie")
+    } else {
+      add_to_map(data["Search"][0], index)
+    }
+  });*/
+}
+
+
+let clean_names = () => {
+  for (var i = 0; i < paths.length; i++) {
+    // fixar till namn
+    var n = paths[i].split("\\").slice(-1)[0];
+    n = n.replace(/\./g, " ");
+    n = n.split("mkv").join("").trim();
+    n = n.split("mp4").join("").trim();
+    console.log("Clean name = " + JSON.stringify(n))
+    get_correct_name(n, i);
+
+  }
+}
+
+clean_names();
+
+
+
+
+
+
+  
+  console.log("Hittade Filmer: " + paths.length);
+
+
 
 var app = express();
 app.use(cors())
@@ -75,10 +144,10 @@ app.use(cors())
 
 
 app.get('/getVideo', function(req, res) {
-      console.log(req.query.videoName)
+      console.log("Requested: " + req.query.videoName)
       const name = req.query.videoName;
       const path = movies[req.query.videoName].file_path
-      console.log(path.file_path);
+      console.log(path);
       const stat = fs.statSync(path)
       const fileSize = stat.size
       const range = req.headers.range
@@ -92,7 +161,7 @@ app.get('/getVideo', function(req, res) {
           'Content-Range': `bytes ${start}-${end}/${fileSize}`,
           'Accept-Ranges': 'bytes',
           'Content-Length': chunksize,
-          'Content-Type': 'video/mp4',
+          'Content-Type': 'video/mmkv',
         }
         res.writeHead(206, head);
         file.pipe(res);
