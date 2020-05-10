@@ -1,12 +1,10 @@
 .row {
-  margin-top: 1%;
+  padding-top: 1%;
 }
 .col-auto {
   margin-left: 1%;
+  margin-top: 1%;
   max-width: 14vw;
-}
-.card {
-  height: 45vh;
 }
 
 .card:hover{
@@ -32,6 +30,37 @@ a:link, a:visited, a:hover, a:active {
 }
 
 
-#videoPlayer {
-  width: 100% !important;
+#movieFeed {
+  padding-top: 3%;
+  padding-bottom: 5%;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#root {
+  background-color: white;
+  min-height: 100vh;
+}
+
+.root-dark {
+  background-color: #191c21;
+  min-height: 100vh;
+}
+
+.card-dark {
+  background-color: #444;
+  color: whitesmoke;
+}
+
+.nav-dark {
+  background-color: #444 !important;
+}
+
+.nav-dark > a {
+  color: whitesmoke;
+}
+
+.nav-dark > ul > li > a{
+  color: whitesmoke;
 }

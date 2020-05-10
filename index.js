@@ -12,7 +12,7 @@ const superagent = require('superagent');
 
 function fromDir(startPath,filter,callback){
 
-    //console.log('Starting from dir '+startPath+'/');
+    console.log('Starting from dir '+startPath+'/');
 
     if (!fs.existsSync(startPath)){
         console.log("no dir ",startPath);
@@ -34,7 +34,7 @@ function fromDir(startPath,filter,callback){
 // \\192.168.0.104\external2\moviesss\Movies\Catch.Me.If.You.Can.2002.1080p.BluRay.x264.AC3-ETRG\Catch.Me.If.You.Can.2002.1080p.BluRay.x264.AC3-ETRG.mp4
 var paths = [];
 fromDir(config.movieDir ,/\.mp4$/,function(filename){
-    //console.log('-- found: ',filename);
+    console.log('-- found: ',filename);
     paths.push(filename);
 });
 fromDir(config.movieDir ,/\.mkv$/,function(filename){
@@ -47,9 +47,9 @@ var movies = {};
 
 
 let add_to_map = (res, index) => {
-  movies[res["Title"]] = res;
+  movies[index] = res;
   //movies[res.Title]["file_path"] = "\\\\192.168.0.4\\storage\\Movies\\Zootopia.mp4";
-  movies[res.Title]["file_path"] = paths[index];
+  movies[index]["movie_id"] = index;
 }
 
 let get_correct_name = (name, index) => {
@@ -85,7 +85,6 @@ let get_correct_name = (name, index) => {
     .end((err, res) => {
       // Do something
       //console.log("asdadasdadad")
-      console.log(res.body)
       if(res.body.Response != 'False') {
         console.log("found serie " + res.body.Title)
         add_to_map(res.body, index)
@@ -143,10 +142,16 @@ app.use(cors())
     });
 
 
-app.get('/getVideo', function(req, res) {
-      console.log("Requested: " + req.query.videoName)
-      const name = req.query.videoName;
-      const path = movies[req.query.videoName].file_path
+app.get('/getVideo/:id/:accessToken/:movieName', function(req, res) {
+      const movieID = req.params.id;
+      const accessToken = req.params.accessToken
+      console.log(req.params.accessToken)
+      let path;
+      if(accessToken != "filip") {
+        path = "C:\\Users\\Filip\\Documents\\filmflux\\Error.mp4\\"
+      } else{
+        path = paths[movieID]
+      }
       console.log(path);
       const stat = fs.statSync(path)
       const fileSize = stat.size
@@ -178,7 +183,7 @@ app.get('/getVideo', function(req, res) {
 
 
 
-    var server = app.listen(config.port, "127.0.0.1",  function () {
+    var server = app.listen(config.port,  function () {
       var location = server.address();
       var host = location.address;
       var port = location.port;
