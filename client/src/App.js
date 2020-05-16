@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { Navbar, NavbarBrand, NavItem, NavLink, Nav, Card, CardBody, CardImg,
-  CardHeader, Row, Col} from 'reactstrap';
-import "video-react/dist/video-react.css"; // import css
-const axios = require('axios');
+  CardHeader} from 'reactstrap';
 
-const apiServer = "http://localhost";
+const axios = require('axios');
+console.log(window.location.hostname)
+const apiServer = "http://127.0.0.1";
 const apiPort = ":9876";
 
 class App extends Component {
@@ -13,23 +13,27 @@ class App extends Component {
 		this.state = {
         searchedMovies: [],
         movies: [],
-        root_class: "",
-        card_class: "",
-        nav_class: "",
-        themeBtn: "Dark Theme"
+        root_class: "root-dark",
+        card_class: "dark",
+        nav_class: "nav-dark",
+        themeBtn: "Light Theme"
 		}
-		this.getMovies = this.getMovies.bind(this);
+    this.isAuthenticated = this.isAuthenticated.bind(this);
+    this.getMovies = this.getMovies.bind(this);
     this.getMovie = this.getMovie.bind(this);
     this.toggleTheme = this.toggleTheme.bind(this);
     this.search = this.search.bind(this);
     this.createMovieList = this.createMovieList.bind(this);
+    this.logout = this.logout.bind(this);
+    this.getCookie = this.getCookie.bind(this);
 	};
 
 	getMovies(){
+    console.log(apiServer + apiPort)
 		axios.get(apiServer + apiPort)
 		.then(res => {
       let movie_list = []
-      for(var [key, val] of Object.entries(res.data)) {
+      for(var val of Object.values(res.data)) {
         movie_list.push(val);
       }
       movie_list.sort((a, b) => (a.Title > b.Title) ? 1 : -1);
@@ -40,6 +44,32 @@ class App extends Component {
 		);
     }
 
+    getCookie(cname) {
+      var name = cname + "=";
+      var decodedCookie = decodeURIComponent(document.cookie);
+      var ca = decodedCookie.split(';');
+      for(var i = 0; i <ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) === ' ') {
+          c = c.substring(1);
+        }
+        if (c.indexOf(name) === 0) {
+          return c.substring(name.length, c.length);
+        }
+      }
+      return "";
+    }
+    
+    isAuthenticated(){
+      let token = this.getCookie('token')
+        if(token === ""){
+            window.location.href = "http://localhost:3000/login"
+        }
+    }
+
+    logout(){
+      document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    }
     getMovie(id){
         axios.get(apiServer + apiPort + "/getVideo",{params: {movieID: id}})
 		.then(res => {
@@ -48,11 +78,12 @@ class App extends Component {
     }
 
 	componentWillMount() {
+    this.isAuthenticated();
 		this.getMovies();
   }
 
   toggleTheme() {
-		if(this.state.themeBtn == "Dark Theme") {
+		if(this.state.themeBtn === "Dark Theme") {
       this.setState({root_class: "root-dark", card_class: "card-dark", nav_class: "nav-dark",themeBtn: "Light Theme"});
     } else {
       this.setState({root_class: "", card_class: "", nav_class: "", themeBtn: "Dark Theme"})
@@ -61,7 +92,7 @@ class App extends Component {
 
   search(e) {
     console.log(e.target.value)
-    if (e.target.value == "") {
+    if (e.target.value === "") {
       this.setState({searchedMovies: this.state.movies})
     } else {
       let search_list = []
@@ -80,16 +111,14 @@ class App extends Component {
     let movie_list = []
     this.state.searchedMovies.map((obj, index) =>
       movie_list.push(
-      <Col xs="auto" key={obj.Title}>
-      <a href={"filmflux://" + apiServer + apiPort + "/getVideo/" + obj.movie_id + "/filip/" + obj.Title} rel="noopener noreferrer">
+      <a key={obj.Title} href={`filmflux://${apiServer + apiPort}/getVideo/${obj.movie_id}/${this.getCookie("token")}/${obj.Title}`} rel="noopener noreferrer">
         <Card className={"movie-frame " + this.state.card_class} id={obj.Title}>
             <CardBody>
               <CardImg top width="100%" src={obj.Poster} alt="Sorry No Poster Found" />
             </CardBody>
-          <CardHeader>{obj.Title}</CardHeader>
+          {false && <CardHeader>{obj.Title}</CardHeader>}
           </Card>
-        </a>
-      </Col>)
+        </a>)
    )
    return movie_list
   }
@@ -116,9 +145,7 @@ class App extends Component {
           </Nav>
       </Navbar>
       <div id="movieFeed">
-      <Row>
-            {this.createMovieList()}
-            </Row>
+        {this.createMovieList()}
       </div>
 
     </div>

@@ -1,7 +1,14 @@
 var express = require('express');
 var path = require('path'), fs=require('fs');
 var cors = require('cors');
+var bodyParser = require('body-parser')
+var cookieSession = require('cookie-session')
+
+
+
+
 const config = require("./config");
+var database = require("./database");
 //const movieDB = require('moviedb')('67f5a7ea9444704a937caf4bb96830fe');
 var omdbApi = require('omdb-client');
 var params = {
@@ -47,9 +54,9 @@ var movies = {};
 
 
 let add_to_map = (res, index) => {
-  movies[index] = res;
+  movies[res.Title] = res;
   //movies[res.Title]["file_path"] = "\\\\192.168.0.4\\storage\\Movies\\Zootopia.mp4";
-  movies[index]["movie_id"] = index;
+  movies[res.Title]["movie_id"] = index;
 }
 
 let get_correct_name = (name, index) => {
@@ -130,7 +137,23 @@ clean_names();
 
 
 var app = express();
-app.use(cors())
+app.use(cors({
+  origin: "*"
+}));
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
+// parse application/json
+app.use(bodyParser.json())
+
+app.use(cookieSession({
+  name: 'session',
+  keys: ['key1', 'key2'],
+  httpOnly: false,
+
+  // Cookie Options
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}))
 
 
     app.get("/index.html", function (req, res, next){
@@ -144,10 +167,11 @@ app.use(cors())
 
 app.get('/getVideo/:id/:accessToken/:movieName', function(req, res) {
       const movieID = req.params.id;
-      const accessToken = req.params.accessToken
+      const accessToken = req.params.accessToken;
+      const valid = database.isAccessTokenValid(accessToken);
       console.log(req.params.accessToken)
       let path;
-      if(accessToken != "filip") {
+      if(!valid) {
         path = "C:\\Users\\Filip\\Documents\\filmflux\\Error.mp4\\"
       } else{
         path = paths[movieID]
@@ -166,7 +190,7 @@ app.get('/getVideo/:id/:accessToken/:movieName', function(req, res) {
           'Content-Range': `bytes ${start}-${end}/${fileSize}`,
           'Accept-Ranges': 'bytes',
           'Content-Length': chunksize,
-          'Content-Type': 'video/mmkv',
+          'Content-Type': 'video/mp4',
         }
         res.writeHead(206, head);
         file.pipe(res);
@@ -180,10 +204,28 @@ app.get('/getVideo/:id/:accessToken/:movieName', function(req, res) {
       }
     });
 
+    app.post('/login', function(req, res) {
+      console.log("/login usrename: " + req.body.username)
+      console.log("/login password: " + req.body.password)
+      let username = req.body.username;
+      let password = req.body.password;
+      database.getUser(username, password, (user) => {
+          if (user === undefined) {
+              console.log('A user tried to login with invalid credentials');
+              res.json({error: "user/password", loggedIn: false});
+              return;
+          }
+          let access_token = database.generateAccessToken();
+          database.saveAccessToken(access_token, user, () => {
+                req.session.access_token = access_token;
+                req.session.userid = req.body.username;
+                console.log(`User ${req.session.userid} has logged in!`);
+              res.json({error: false, loggedIn: true, token: access_token});
+          });
+      });
+   });
 
-
-
-    var server = app.listen(config.port,  function () {
+     var server = app.listen(config.port, "localhost",  function () {
       var location = server.address();
       var host = location.address;
       var port = location.port;

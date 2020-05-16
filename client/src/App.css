@@ -1,41 +1,44 @@
-.row {
-  padding-top: 1%;
-}
-.col-auto {
-  margin-left: 1%;
-  margin-top: 1%;
-  max-width: 14vw;
-}
-
 .card:hover{
   transform: scale(1.02, 1.02);
 }
 .card-img-top {
-  height: 100%;
+  height: 420px;
+  width: 100%;
   object-fit: cover;
 }
 
 .card-body {
   padding: 0px;
+  width: inherit;
 }
 
 .card-header {
   text-align: center;
 }
 
+.card {
+  border: none;
+}
+
 a:link, a:visited, a:hover, a:active {
   color: black;
   text-align: center;
   text-decoration: none;
+  float: left;
+}
+
+#movieFeed > a:link, a:visited, a:hover, a:active {
+  width: 25vh;
 }
 
 
 #movieFeed {
-  padding-top: 3%;
+  padding-top: 5%;
   padding-bottom: 5%;
   width: 90%;
   margin-left: auto;
   margin-right: auto;
+  display: table;
 }
 
 #root {
