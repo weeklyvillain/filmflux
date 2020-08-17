@@ -1,6 +1,6 @@
 var config = {};
 
-config.movieDir = "\\\\192.168.0.4\\storage\\Movie\\";
+config.movieDir = "C:\\Users\\Filip\\Videos\\DVD-RIP";
 //config.movieDir = "/home/filip/filmflux"
 config.port = 9876;
 
