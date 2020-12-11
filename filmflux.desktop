@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=FilmFlux
+Exec="vlc | sed s/filmflux\?:\/\///"
+StartupNotify=false
+MimeType=x-scheme-handler/ddg;

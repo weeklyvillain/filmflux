@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { Navbar, NavbarBrand, NavItem, NavLink, Nav, Card, CardBody, CardImg,
-  CardHeader} from 'reactstrap';
+import { Navbar, NavbarBrand, NavItem, NavLink, Nav, Card, CardBody, CardImg } from 'reactstrap';
+
+import Movie from './Movie';
 
 const axios = require('axios');
 console.log(window.location.hostname)
@@ -16,7 +17,9 @@ class App extends Component {
         root_class: "root-dark",
         card_class: "dark",
         nav_class: "nav-dark",
-        themeBtn: "Light Theme"
+        themeBtn: "Light Theme",
+        movieView: false,
+        selectedMovie: {}
 		}
     this.isAuthenticated = this.isAuthenticated.bind(this);
     this.getMovies = this.getMovies.bind(this);
@@ -26,6 +29,7 @@ class App extends Component {
     this.createMovieList = this.createMovieList.bind(this);
     this.logout = this.logout.bind(this);
     this.getCookie = this.getCookie.bind(this);
+    this.enterMovie = this.enterMovie.bind(this);
 	};
 
 	getMovies(){
@@ -107,18 +111,34 @@ class App extends Component {
     }
   }
 
+  enterMovie(e) {
+    let title = e.target.getAttribute('data');
+    // if we push the button and are not in movieView
+    let clicked = {};
+    this.state.searchedMovies.forEach(movie => {
+      if(movie.Title === title) {
+        clicked = movie;
+      }
+    });
+    console.log(clicked["Title"])
+    if(!this.state.movieView) {
+      this.setState({selectedMovie: clicked, movieView: !this.state.movieView})
+    }
+  }
+
+  //<a key={obj.Title} href={`${apiServer + apiPort}/getVideo/${obj.movie_id}/${this.getCookie("token")}/${obj.Title}`} rel="noopener noreferrer">
   createMovieList() {
     let movie_list = []
     this.state.searchedMovies.map((obj, index) =>
       movie_list.push(
-      <a key={obj.Title} href={`filmflux://${apiServer + apiPort}/getVideo/${obj.movie_id}/${this.getCookie("token")}/${obj.Title}`} rel="noopener noreferrer">
+        <a href="#" key={obj.Title} data-key={obj.Title} onClick={this.enterMovie}>
         <Card className={"movie-frame " + this.state.card_class} id={obj.Title}>
             <CardBody>
-              <CardImg top width="100%" src={obj.Poster} alt="Sorry No Poster Found" />
+              <CardImg data={obj.Title} top width="100%" src={obj.Poster} alt="Sorry No Poster Found" />
             </CardBody>
-          {false && <CardHeader>{obj.Title}</CardHeader>}
           </Card>
-        </a>)
+        </a>
+        )
    )
    return movie_list
   }
@@ -144,10 +164,15 @@ class App extends Component {
             </NavItem>
           </Nav>
       </Navbar>
-      <div id="movieFeed">
+      {!this.state.movieView && <div id="movieFeed">
         {this.createMovieList()}
-      </div>
-
+      </div>}
+      {console.log(this.state.selectedMovie)}
+      {this.state.movieView && 
+      <Movie Id={this.state.selectedMovie["movie_id"]} Title={this.state.selectedMovie["Title"]} Plot={this.state.selectedMovie["Plot"]} 
+              Rating={this.state.selectedMovie["imdbRating"]} Poster={this.state.selectedMovie["Poster"]}>
+      </Movie>
+      }
     </div>
       );
 

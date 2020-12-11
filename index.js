@@ -115,6 +115,7 @@ let clean_names = () => {
   for (var i = 0; i < paths.length; i++) {
     // fixar till namn
     var n = paths[i].split("\\").slice(-1)[0];
+    var n = paths[i].split("/").slice(-1)[0];
     n = n.replace(/\./g, " ");
     n = n.split("mkv").join("").trim();
     n = n.split("mp4").join("").trim();
@@ -172,11 +173,11 @@ app.get('/getVideo/:id/:accessToken/:movieName', function(req, res) {
       console.log(req.params.accessToken)
       let path;
       if(!valid) {
-        path = "C:\\Users\\Filip\\Documents\\filmflux\\Error.mp4\\"
+        path = "/home/filip/Documents/filmflux/Error.mp4"
       } else{
         path = paths[movieID]
       }
-      console.log(path);
+      console.log(movies);
       const stat = fs.statSync(path)
       const fileSize = stat.size
       const range = req.headers.range
