@@ -6,9 +6,17 @@ const apiPort = ":9876";
 class Movie extends Component {
     constructor(props){ 
         super(props);
+        this.state = {
+          showVideoInfo: true
+      }
+        this.playVideo = this.playVideo.bind(this);
         this.getCookie = this.getCookie.bind(this);
     };
     
+    playVideo() {
+        this.setState({showVideoInfo: !this.state.showVideoInfo});
+    }
+
     getCookie(cname) {
         var name = cname + "=";
         var decodedCookie = decodeURIComponent(document.cookie);
@@ -28,13 +36,22 @@ class Movie extends Component {
 	render() {
 		return (
             <div id="movieInfo">
-                <h1>{this.props.Title}</h1>
-                <img src={this.props.Poster}></img>
-                <a href={`${apiServer + apiPort}/getVideo/${this.props.Id}/${this.getCookie("token")}/${this.props.Title}`} rel="noopener noreferrer">
-                    <img src={'/playBtn.png'}></img>
-                </a>
-                <p>{this.props.Plot}</p>
-                <p>Rating: {this.props.Rating} / 10</p>
+                {!this.state.showVideoInfo && 
+                  <video id="videoPlayer" controls autoPlay>
+                    <source src={`${apiServer + apiPort}/getVideo/${this.props.Id}/${this.getCookie("token")}/${this.props.Title}`}
+                            type="video/mp4" />
+                      Your browser does not support the video tag.
+                  </video>
+                }
+                {this.state.showVideoInfo && 
+                  <div>
+                    <h1>{this.props.Title}</h1>
+                    <img src={this.props.Poster}></img>
+                    <img id="playBtn" onClick={this.playVideo} src={'/playBtn.png'}></img>
+                    <p>{this.props.Plot}</p>
+                    <p>Rating: {this.props.Rating} / 10</p>
+                  </div>
+                }
             </div>
       );
 
