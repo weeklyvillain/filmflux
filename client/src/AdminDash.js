@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import './movie.css';
+import './adminDash.css';
+
+const axios = require('axios');
 const apiServer = "http://" + window.location.hostname;
 const apiPort = ":9876";
 
@@ -7,11 +9,14 @@ class AdminDash extends Component {
     constructor(props){ 
         super(props);
         this.state = {
-          
+          cpuInfo: '0%',
+          memInfo: '0mb',
+          driveInfo: '0mb'
         }
         this.getCookie = this.getCookie.bind(this);
         this.isUserAdmin = this.isUserAdmin.bind(this);
         this.isAuthenticated = this.isAuthenticated.bind(this);
+        this.getServerStats = this.getServerStats.bind(this);
     };
 
     isAuthenticated(){
@@ -38,9 +43,30 @@ class AdminDash extends Component {
           });
     }
 
+    getServerStats() {
+    axios.get(apiServer + apiPort + '/getServerStats')
+      .then(res => {
+        console.log(res)
+        this.setState({cpuInfo: {usage: res.data.cpuUsage, cores: res.data.cores}, memInfo: res.data.memInfo, driveInfo: res.data.hdd});
+        }
+      );
+    }
+
     componentWillMount() {
       this.isAuthenticated();
       this.isUserAdmin();
+      this.getServerStats();
+    }
+
+    componentDidMount() {
+      this.getServerStats();
+      this.interval = setInterval(() => {
+        this.getServerStats();
+      }, 2000);
+    }
+
+    componentWillUnmount() {
+      clearInterval(this.interval);
     }
 
     getCookie(cname) {
@@ -61,17 +87,16 @@ class AdminDash extends Component {
 
 	render() {
 		return (
-            <div>
+            <div id="adminDashWrapper">
                 <h1>This is the admin Dashboard! this shit is under construction</h1>
-                <h1>This is the admin Dashboard! this shit is under construction</h1>
-                <h1>This is the admin Dashboard! this shit is under construction</h1>
-                <h1>This is the admin Dashboard! this shit is under construction</h1>
-                <h1>This is the admin Dashboard! this shit is under construction</h1>
-                <h1>This is the admin Dashboard! this shit is under construction</h1>
-                <h1>This is the admin Dashboard! this shit is under construction</h1>
-                <h1>This is the admin Dashboard! this shit is under construction</h1>
-                <h1>This is the admin Dashboard! this shit is under construction</h1>
-                <h1>This is the admin Dashboard! this shit is under construction</h1>
+                <h1>-----------------------------------------------------------------------------------------------</h1>
+                <h1>Cpu Cores: {this.state.cpuInfo.cores}</h1>
+                <h1>Cpu Usage: {Math.round(this.state.cpuInfo.usage)}%</h1>
+                <h1>Total Memory: {this.state.memInfo.totalMemMb}MB</h1>
+                <h1>Memory Usage: {Math.round(100 - this.state.memInfo.freeMemPercentage)}%</h1>
+                <h1>Total Hdd Space: {this.state.driveInfo.totalGb}GB</h1>
+                <h1>Used Hdd Space: {this.state.driveInfo.usedGb}GB</h1>
+                <h1>-----------------------------------------------------------------------------------------------</h1>
                 <h1>This is the admin Dashboard! this shit is under construction</h1>
                 <h1>This is the admin Dashboard! this shit is under construction</h1>
                 <h1>This is the admin Dashboard! this shit is under construction</h1>

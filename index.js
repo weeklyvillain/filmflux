@@ -3,6 +3,7 @@ var path = require('path'), fs=require('fs');
 var cors = require('cors');
 var bodyParser = require('body-parser')
 var cookieSession = require('cookie-session')
+var osu = require('node-os-utils')
 
 
 
@@ -233,6 +234,22 @@ app.get('/getVideo/:id/:accessToken/:movieName', function(req, res) {
         console.log("User is admin: " + isAdmin);
         res.json({error: false, isAdmin: isAdmin})
       });
+    });
+
+    app.get('/getServerStats', (req, res) => {
+      let cpu = osu.cpu;
+      let cpuCores = cpu.count();
+      let hdd = osu.drive;
+      let mem = osu.mem;
+      cpu.usage().then(cpuUsage => {
+        hdd.info().then(hddInfo => {
+          mem.info().then(memInfo =>{
+            res.json({cores: cpuCores, cpuUsage: cpuUsage, memInfo: memInfo, hdd: hddInfo})
+          })
+        })
+      })
+
+
     });
 
      var server = app.listen(config.port, "localhost",  function () {

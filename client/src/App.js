@@ -4,7 +4,7 @@ import { Navbar, NavbarBrand, NavItem, NavLink, Nav, Card, CardBody, CardImg } f
 import Movie from './Movie';
 
 const axios = require('axios');
-console.log(window.location.hostname)
+
 const apiServer = "http://127.0.0.1";
 const apiPort = ":9876";
 
