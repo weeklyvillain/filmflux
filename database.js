@@ -87,6 +87,15 @@ function isAccessTokenValid(token) {
     return row != undefined
 }
 
+function isUserAdmin(token, callback) {
+    let isAdmin = false;
+    const row = db.prepare('SELECT * FROM user_token WHERE token = ?').get(token);
+    if(row != undefined) {
+        isAdmin = db.prepare('SELECT isAdmin FROM users WHERE id = ?').get(row.user_id);
+    }
+    callback(isAdmin)
+}
+
 
 exports.getUser = getUser;
 exports.generateAccessToken = generateAccessToken;
@@ -94,3 +103,4 @@ exports.saveAccessToken = saveAccessToken;
 exports.registerUser = registerUser;
 exports.getUserIDFromToken = getUserIDFromToken;
 exports.isAccessTokenValid = isAccessTokenValid;
+exports.isUserAdmin = isUserAdmin;

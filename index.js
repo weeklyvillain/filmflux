@@ -224,7 +224,16 @@ app.get('/getVideo/:id/:accessToken/:movieName', function(req, res) {
               res.json({error: false, loggedIn: true, token: access_token});
           });
       });
-   });
+    });
+
+    app.post('/isAdmin', function(req, res) {
+      let token = req.body.token;
+      
+      database.isUserAdmin(token, (isAdmin) => {
+        console.log("User is admin: " + isAdmin);
+        res.json({error: false, isAdmin: isAdmin})
+      });
+    });
 
      var server = app.listen(config.port, "localhost",  function () {
       var location = server.address();

@@ -12,6 +12,7 @@ class App extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
+        isAdmin: false,
         searchedMovies: [],
         movies: [],
         root_class: "root-dark",
@@ -22,6 +23,7 @@ class App extends Component {
         selectedMovie: {}
 		}
     this.isAuthenticated = this.isAuthenticated.bind(this);
+    this.isUserAdmin = this.isUserAdmin.bind(this);
     this.getMovies = this.getMovies.bind(this);
     this.getMovie = this.getMovie.bind(this);
     this.toggleTheme = this.toggleTheme.bind(this);
@@ -71,6 +73,25 @@ class App extends Component {
         }
     }
 
+    isUserAdmin() {
+      let endpoint = apiServer + apiPort + "/isAdmin";
+      const body = { token: this.getCookie('token') };
+ 
+        fetch(endpoint, {
+            method: 'post',
+            body:    JSON.stringify(body),
+            headers: { 'Content-Type': 'application/json' },
+        })
+        .then(res => res.json())
+        .then(json => {
+            console.log(json['isAdmin']['isAdmin']);
+            if(json['isAdmin']['isAdmin']) {
+                this.setState({isAdmin: true});
+            }
+        });
+        this.setState({isAdmin: false});
+    }
+
     logout(){
       document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
     }
@@ -83,6 +104,7 @@ class App extends Component {
 
 	componentWillMount() {
     this.isAuthenticated();
+    this.isUserAdmin();
 		this.getMovies();
   }
 
@@ -156,6 +178,9 @@ class App extends Component {
                 <form className="form-inline">
                   <input className="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" onChange={this.search}></input>
                 </form>
+              {this.state.isAdmin && <NavItem>
+                <NavLink href="/admin_dashboard">Admin Dashboard</NavLink>
+              </NavItem>}
               <NavItem>
                 <NavLink href="#" onClick={this.toggleTheme}>{this.state.themeBtn}</NavLink>
             </NavItem>
