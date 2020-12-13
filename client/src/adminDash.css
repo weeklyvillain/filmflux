@@ -1,3 +1,38 @@
 #adminDashWrapper {
+  width: 100vw;
+  padding: 1%;
+  text-align: center;
   color: white;
+}
+
+#adminDashWrapper a{
+  margin-left: 30vw;
+  margin-right: 30vw;
+  width: auto;
+  height: auto;
+  margin-top: 10vh;
+
+}
+
+a h1 {
+  display: inline-block;
+  width: 40vw;
+  padding: 14px;
+  color: #fff;
+  border: 1px solid #fff;
+  text-align: center;
+  outline: none;
+  text-decoration: none;
+  transition: background-color 0.2s ease-out,
+              color 0.2s ease-out;
+
+}
+
+a h1:hover,
+a h1:active {
+  background-color: #fff;
+  color: #000;
+  transition: background-color 0.3s ease-in,
+              color 0.3s ease-in;
+
 }

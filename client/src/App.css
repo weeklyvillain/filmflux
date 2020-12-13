@@ -41,11 +41,6 @@ a:hover + .card-header {
   display: block;
 }
 
-#movieFeed > a:link, a:visited, a:hover, a:active {
-  width: 25vh;
-}
-
-
 #movieFeed {
   padding-top: 5%;
   padding-bottom: 5%;

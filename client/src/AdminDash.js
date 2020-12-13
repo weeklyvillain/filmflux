@@ -9,9 +9,11 @@ class AdminDash extends Component {
     constructor(props){ 
         super(props);
         this.state = {
-          cpuInfo: '0%',
+          cpuInfo: {usage: '0', cores: '0'},
           memInfo: '0mb',
-          driveInfo: '0mb'
+          driveInfo: '0mb',
+          movieInfo: '0',
+          numberOfStreams: '0'
         }
         this.getCookie = this.getCookie.bind(this);
         this.isUserAdmin = this.isUserAdmin.bind(this);
@@ -47,7 +49,7 @@ class AdminDash extends Component {
     axios.get(apiServer + apiPort + '/getServerStats')
       .then(res => {
         console.log(res)
-        this.setState({cpuInfo: {usage: res.data.cpuUsage, cores: res.data.cores}, memInfo: res.data.memInfo, driveInfo: res.data.hdd});
+        this.setState({cpuInfo: {usage: res.data.cpuUsage, cores: res.data.cores}, memInfo: res.data.memInfo, driveInfo: res.data.hdd, movieInfo: res.data.movieCount, numberOfStreams: res.data.numStreams});
         }
       );
     }
@@ -88,8 +90,9 @@ class AdminDash extends Component {
 	render() {
 		return (
             <div id="adminDashWrapper">
-                <h1>This is the admin Dashboard! this shit is under construction</h1>
+                <h1>Welcome to the AdminDash!</h1>
                 <h1>-----------------------------------------------------------------------------------------------</h1>
+                <h1>System Information</h1>
                 <h1>Cpu Cores: {this.state.cpuInfo.cores}</h1>
                 <h1>Cpu Usage: {Math.round(this.state.cpuInfo.usage)}%</h1>
                 <h1>Total Memory: {this.state.memInfo.totalMemMb}MB</h1>
@@ -97,12 +100,9 @@ class AdminDash extends Component {
                 <h1>Total Hdd Space: {this.state.driveInfo.totalGb}GB</h1>
                 <h1>Used Hdd Space: {this.state.driveInfo.usedGb}GB</h1>
                 <h1>-----------------------------------------------------------------------------------------------</h1>
-                <h1>This is the admin Dashboard! this shit is under construction</h1>
-                <h1>This is the admin Dashboard! this shit is under construction</h1>
-                <h1>This is the admin Dashboard! this shit is under construction</h1>
-                <h1>This is the admin Dashboard! this shit is under construction</h1>
-                <h1>This is the admin Dashboard! this shit is under construction</h1>
-                <h1>This is the admin Dashboard! this shit is under construction</h1>
+                <h1>Currently we have located {this.state.movieInfo} movies on your system</h1>
+                <h1>People with access to the server has streamed {this.state.numberOfStreams} movies</h1>
+                <a href="http://localhost:3000"><h1>Return to the mainpage...</h1></a>
             </div>
       );
 

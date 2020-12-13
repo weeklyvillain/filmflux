@@ -38,6 +38,8 @@ function fromDir(startPath,filter,callback){
     };
 };
 
+let streamedMovies = 0;
+
 // exempel path
 // \\192.168.0.104\external2\moviesss\Movies\Catch.Me.If.You.Can.2002.1080p.BluRay.x264.AC3-ETRG\Catch.Me.If.You.Can.2002.1080p.BluRay.x264.AC3-ETRG.mp4
 var paths = [];
@@ -168,6 +170,7 @@ app.use(cookieSession({
 
 
 app.get('/getVideo/:id/:accessToken/:movieName', function(req, res) {
+      streamedMovies += 1;
       const movieID = req.params.id;
       const accessToken = req.params.accessToken;
       const valid = database.isAccessTokenValid(accessToken);
@@ -244,7 +247,7 @@ app.get('/getVideo/:id/:accessToken/:movieName', function(req, res) {
       cpu.usage().then(cpuUsage => {
         hdd.info().then(hddInfo => {
           mem.info().then(memInfo =>{
-            res.json({cores: cpuCores, cpuUsage: cpuUsage, memInfo: memInfo, hdd: hddInfo})
+            res.json({cores: cpuCores, cpuUsage: cpuUsage, memInfo: memInfo, hdd: hddInfo, movieCount: paths.length, numStreams: streamedMovies})
           })
         })
       })
