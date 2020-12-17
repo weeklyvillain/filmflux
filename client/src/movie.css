@@ -23,7 +23,11 @@
        -moz-animation: fadein 1.5s; /* Firefox < 16 */
         -ms-animation: fadein 1.5s; /* Internet Explorer */
          -o-animation: fadein 1.5s; /* Opera < 12.1 */
-            animation: fadein 1.5s;
+         animation: fadein 1.5s;
+  height: 100vh;
+  width: 100vw;
+  background-size: cover;
+
 }
 
 @keyframes fadein {

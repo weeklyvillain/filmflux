@@ -42,7 +42,7 @@ class App extends Component {
       for(var val of Object.values(res.data)) {
         movie_list.push(val);
       }
-      movie_list.sort((a, b) => (a.Title > b.Title) ? 1 : -1);
+      movie_list.sort((a, b) => (a.title > b.title) ? 1 : -1);
       
 			this.setState({movies: movie_list, searchedMovies: movie_list});
       console.table(movie_list);
@@ -125,7 +125,7 @@ class App extends Component {
       console.log(this.state.movies)
       for(let id in this.state.movies) {
         
-        if(this.state.movies[id].Title.toLowerCase().includes(e.target.value.toLowerCase())){
+        if(this.state.movies[id].title.toLowerCase().includes(e.target.value.toLowerCase())){
           search_list.push(this.state.movies[id])
         }
       }
@@ -138,11 +138,11 @@ class App extends Component {
     // if we push the button and are not in movieView
     let clicked = {};
     this.state.searchedMovies.forEach(movie => {
-      if(movie.Title === title) {
+      if(movie.title === title) {
         clicked = movie;
       }
     });
-    console.log(clicked["Title"])
+    console.log(clicked["title"])
     if(!this.state.movieView) {
       this.setState({selectedMovie: clicked, movieView: !this.state.movieView})
     }
@@ -153,10 +153,10 @@ class App extends Component {
     let movie_list = []
     this.state.searchedMovies.map((obj, index) =>
       movie_list.push(
-        <a href="#" key={obj.Title} data-key={obj.Title} onClick={this.enterMovie}>
-        <Card className={"movie-frame " + this.state.card_class} id={obj.Title}>
+        <a href="#" key={obj.title} data-key={obj.title} onClick={this.enterMovie}>
+        <Card className={"movie-frame " + this.state.card_class} id={obj.title}>
             <CardBody>
-              <CardImg data={obj.Title} top width="100%" src={obj.Poster} alt="Sorry No Poster Found" />
+              <CardImg data={obj.title} top width="100%" src={"https://image.tmdb.org/t/p/w300" + obj.poster_path} alt="Sorry No Poster Found" />
             </CardBody>
           </Card>
         </a>
@@ -194,8 +194,7 @@ class App extends Component {
       </div>}
       {console.log(this.state.selectedMovie)}
       {this.state.movieView && 
-      <Movie Id={this.state.selectedMovie["movie_id"]} Title={this.state.selectedMovie["Title"]} Plot={this.state.selectedMovie["Plot"]} 
-              Rating={this.state.selectedMovie["imdbRating"]} Poster={this.state.selectedMovie["Poster"]}>
+      <Movie movieJson={this.state.selectedMovie}>
       </Movie>
       }
     </div>

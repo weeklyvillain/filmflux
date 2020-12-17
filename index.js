@@ -57,23 +57,23 @@ var movies = {};
 
 
 let add_to_map = (res, index) => {
-  movies[res.Title] = res;
+  movies[res.title] = res;
   //movies[res.Title]["file_path"] = "\\\\192.168.0.4\\storage\\Movies\\Zootopia.mp4";
-  movies[res.Title]["movie_id"] = index;
+  movies[res.title]["movie_id"] = index;
 }
 
 let get_correct_name = (name, index) => {
   params.query = name;
 
   superagent
-    .get('http://www.omdbapi.com/')
-    .query({ t: name, apiKey: "d9d4c56a"}) // query string
+    .get('https://api.themoviedb.org/3/search/movie?')
+    .query({ query: name, api_key: "67f5a7ea9444704a937caf4bb96830fe"}) // query string
     .end((err, res) => {
       // Do something
-      //console.log("asdadasdadad")
-      //console.log(res.body)
+      console.log("asdadasdadad")
+      console.log(res.body['results'][0])
       if(res.body.Response != 'False') {
-        add_to_map(res.body, index)
+        add_to_map(res.body['results'][0], index)
       }
   });
 
@@ -128,7 +128,28 @@ let clean_names = () => {
   }
 }
 
-clean_names();
+let nameMatch = (name) => {
+  name = name.split("/").slice(-1)[0];
+  name = name.split("\\").slice(-1)[0];
+
+  
+  let re = new RegExp("([ .\\w'!-]+?)(\\W\\d{4}\\W?.*)", 'gm');
+  let matches = re.exec(name)
+  if (matches != null && matches.length >= 2) {
+      name = matches[1];
+      name = name.replace(/\./g, ' ');
+      name = name.trim();
+  }
+  name = name.split(".mkv").join("").trim();
+  name = name.split(".mp4").join("").trim();
+  return name;
+}
+
+for(var i = 0; i < paths.length; i++) {
+  let name = nameMatch(paths[i]);
+  console.log("NAME IS: " + name)
+  get_correct_name(name, i);
+}
 
 
 

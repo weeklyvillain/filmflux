@@ -34,22 +34,22 @@ class Movie extends Component {
     }
 
 	render() {
+    console.log("from movie: " + JSON.stringify(this.props.movieJson))
 		return (
-            <div id="movieInfo">
+            <div id="movieInfo" style={{ backgroundImage: "url(https://image.tmdb.org/t/p/original" + this.props.movieJson.backdrop_path + ")"}}>
                 {!this.state.showVideoInfo && 
                   <video id="videoPlayer" controls autoPlay>
-                    <source src={`${apiServer + apiPort}/getVideo/${this.props.Id}/${this.getCookie("token")}/${this.props.Title}`}
+                    <source src={`${apiServer + apiPort}/getVideo/${this.props.movieJson.movie_id}/${this.getCookie("token")}/${this.props.Title}`}
                             type="video/mp4" />
                       Your browser does not support the video tag.
                   </video>
                 }
                 {this.state.showVideoInfo && 
                   <div>
-                    <h1>{this.props.Title}</h1>
-                    <img src={this.props.Poster}></img>
+                    <h1>{this.props.movieJson.title}</h1>
                     <img id="playBtn" onClick={this.playVideo} src={'/playBtn.png'}></img>
-                    <p>{this.props.Plot}</p>
-                    <p>Rating: {this.props.Rating} / 10</p>
+                    <p>{this.props.movieJson.overview}</p>
+                    <p>Rating: {this.props.movieJson.vote_average} / 10</p>
                   </div>
                 }
             </div>
@@ -58,3 +58,4 @@ class Movie extends Component {
 	}
 }
 export default Movie;
+//<img id="backdrop" src={"https://image.tmdb.org/t/p/original" + this.props.movieJson.backdrop_path}></img>

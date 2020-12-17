@@ -1,5 +1,5 @@
 .card:hover{
-  transform: scale(1.02, 1.02);
+  transform: scale(1.05, 1.05);
 }
 /* Centered text */
 .centered {
@@ -44,9 +44,9 @@ a:hover + .card-header {
 #movieFeed {
   padding-top: 5%;
   padding-bottom: 5%;
-  width: 90%;
-  margin-left: auto;
-  margin-right: auto;
+  width: auto;
+  margin-left: 10vw;
+  margin-right: 10vw;
   display: table;
 }
 
@@ -63,6 +63,7 @@ a:hover + .card-header {
 .card-dark {
   background-color: #444;
   color: whitesmoke;
+
 }
 
 .nav-dark {
