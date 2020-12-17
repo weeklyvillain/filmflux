@@ -45,7 +45,7 @@ class Movie extends Component {
                   </video>
                 }
                 {this.state.showVideoInfo && 
-                  <div>
+                  <div id="videoInfo">
                     <h1>{this.props.movieJson.title}</h1>
                     <img id="playBtn" onClick={this.playVideo} src={'/playBtn.png'}></img>
                     <p>{this.props.movieJson.overview}</p>
